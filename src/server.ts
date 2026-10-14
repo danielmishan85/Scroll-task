@@ -16,6 +16,7 @@ type FormattedShow = {
 };
 
 const app = express();
+let results;
 
 app.use(cors());
 app.use(express.json());
@@ -42,19 +43,36 @@ app.get("/api/shows", async (req, res) => {
         .json({ error: "Failed to fetch show data from TVmaze" });
     }
 
-    const results = await response.json();
+    results = await response.json();
+
+    if (!Array.isArray(results)) {
+      results = [];
+    }
 
     //format results
-    const data: FormattedShow[] = (results ?? []).map((item: TvmazeItem) => {
+    let data: FormattedShow[] = results.map((item: TvmazeItem) => {
       return {
-        id: item.show.id ?? Math.random(),
+        id: item.show.id ?? Math.floor(Math.random() * 100_000),
         name: item.show.name ?? "Unknown",
         genres:
           item.show.genres && item.show.genres.length > 0
-            ? item.show.genres.join(",")
+            ? item.show.genres.join(", ")
             : "No genres.",
       };
     });
+
+    data = [
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+      ...data,
+    ];
 
     //Implement pagination
     const startIndex = (page - 1) * limit;
